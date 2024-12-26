@@ -1,6 +1,9 @@
 package API.controllers;
 
 import API.domain.Customer;
+import org.apache.coyote.Response;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -16,46 +19,70 @@ public class CustomerController {
             new Customer(3, "Marisol", "msf", "123")
     ));
 
+    /**
+     * Method to get a list with all the customers
+     * @return - List of customers
+     */
     @GetMapping
-    public List<Customer> getCustomers() {
-        return customers;
+    public ResponseEntity<List<Customer>> getCustomers() {
+        return ResponseEntity.ok(customers);
     }
 
+    /**
+     * Endpoint to get a customer by username
+     * @param username - Username used to find a user
+     * @return - The user with the username introduced or an error message instead
+     */
     @GetMapping("/{username}")
-    public Customer getCustomerByUsername(@PathVariable String username) {
+    public ResponseEntity<?> getCustomerByUsername(@PathVariable String username) {
         for (Customer customer : customers) {
-            if (customer.getUsername().equals(username)) return customer;
+            if (customer.getUsername().equals(username)) return ResponseEntity.ok(customer);
         }
-        return new Customer();
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Cliente no encontrado con username: " + username);
     }
 
+    /**
+     * Endpoint to register a new customer
+     * @param customer - Customer to be registered
+     * @return - A success message
+     */
     @PostMapping
-    public Customer addCustomer(@RequestBody Customer customer) {
+    public ResponseEntity<String> addCustomer(@RequestBody Customer customer) {
         customers.add(customer);
-        return customer;
+        return ResponseEntity.status(HttpStatus.CREATED).body("Customer created successfully: " + customer.getUsername());
     }
 
+    /**
+     * Endpoint to update all customer data
+     * @param customer - All data customer
+     * @return
+     */
     @PutMapping
-    public Customer updateCustomer(@RequestBody Customer customer) {
+    public ResponseEntity<?> updateCustomer(@RequestBody Customer customer) {
         for(Customer c : customers) {
             if(c.getId() == customer.getId()) {
                 c.setUsername(customer.getUsername());
                 c.setPassword(customer.getPassword());
                 c.setName(customer.getName());
-                return c;
+                return ResponseEntity.ok("Customer updated successfully: " + customer.getId());
             }
         }
-        return new Customer();
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Customer not found: " + customer.getId());
     }
 
+    /**
+     * Endpoint to Delete a user by its ID
+     * @param id - ID from user to be deleted
+     * @return - Operation status
+     */
     @DeleteMapping("/{id}")
-    public Customer deleteCustomer(@PathVariable int id) {
+    public ResponseEntity<?> deleteCustomer(@PathVariable int id) {
         for (Customer customer : customers) {
             if(customer.getId() == id) {
                 customers.remove(customer);
-                return customer;
+                return ResponseEntity.ok(HttpStatus.NO_CONTENT);
             }
         }
-        return new Customer();
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Customer not found: " + id);
     }
 }
