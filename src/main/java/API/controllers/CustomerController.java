@@ -64,10 +64,10 @@ public class CustomerController {
                 c.setUsername(customer.getUsername());
                 c.setPassword(customer.getPassword());
                 c.setName(customer.getName());
-                return ResponseEntity.ok("Customer updated successfully: " + customer.getId());
+                return ResponseEntity.noContent().build();
             }
         }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Customer not found: " + customer.getId());
+        return ResponseEntity.notFound().build();
     }
 
     /**
@@ -80,9 +80,9 @@ public class CustomerController {
         for (Customer customer : customers) {
             if(customer.getId() == id) {
                 customers.remove(customer);
-                return ResponseEntity.ok(HttpStatus.NO_CONTENT);
+                return ResponseEntity.noContent().build();
             }
         }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Customer not found: " + id);
+        return ResponseEntity.notFound().build();
     }
 }
